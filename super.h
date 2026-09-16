@@ -4,9 +4,9 @@
 
 // the Main
 struct __baiano_superblock {
-	__le64 magic;
-	__le32 block_size;
-	__le32 inode_cout;
+	__u64 magic;
+	__u32 block_size;
+	__u32 inode_cout;
 } __packed;
 
 
