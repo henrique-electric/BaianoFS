@@ -65,8 +65,8 @@ RUN chmod +x /usr/local/bin/build-initramfs.sh
 # defaults to arm64 without having to type these on every invocation.
 # Override on the command line to target x86_64 instead, e.g.:
 #   make ARCH=x86_64 CROSS_COMPILE=x86_64-linux-gnu- defconfig
-ENV ARCH=arm64
-ENV CROSS_COMPILE=aarch64-linux-gnu-
+ENV ARCH=x86_64
+#ENV CROSS_COMPILE=aarch64-linux-gnu-
 
 WORKDIR /workspace/linux
 
