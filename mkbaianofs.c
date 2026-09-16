@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 
 	for (int i = 0; i < MAX_INODE_COUNT; i ++) {
 		__inode_struct->size = 0;
-		memset(name, 0x0, 255);
+		memset(__inode_struct->name, 0x0, 255);
 		lseek(device, BAIANOFS_BLSIZE, SEEK_CUR);
 		write(device, (void*) __inode_struct, sizeof(struct inode_struct));
 	}
