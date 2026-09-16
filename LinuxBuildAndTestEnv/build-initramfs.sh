@@ -69,7 +69,7 @@ chmod +x "$ROOTFS/init"
 
 echo "==> Packing cpio.gz"
 mkdir -p "$OUT_DIR"
-OUT_FILE="$OUT_DIR/initramfs-${ARCH}.cpio.gz"
+OUT_FILE="$OUT_DIR/initramfs.cpio.gz"
 ( cd "$ROOTFS" && find . -print0 | cpio --null -ov --format=newc 2>/dev/null | gzip -9 ) > "$OUT_FILE"
 
 echo "==> Done: $OUT_FILE"
