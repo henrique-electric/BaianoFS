@@ -4,9 +4,11 @@
 #include <linux/fs/super.h>
 #include <linux/fs/super_types.h>
 #include <linux/buffer_head.h>
+#include <linux/container_of.h>
 
 #include "super.h"
 #include "fs.h"
+#include "inode.h"
 
 #define DEFAULT_BSIZE 512
 #define BAIANO_MAGIC 0x004F4E41494142	// I reversed, because i reversed on mkbaianofs.c, since the cpu is writing on little endian, I HAVE TO FIX THIS!!
@@ -27,11 +29,35 @@ static const struct fs_context_operations __ctx_ops = {
 }; 
 
 
+struct inode *__baiano_alloc_inode(struct super_block *sb) {
+	struct __vfs_baiano_inode *inode = NULL;
+	inode = kmalloc(sizeof(struct __vfs_baiano_inode), GFP_KERNEL);
+	if (inode == NULL)
+		pr_err("NULL has been returned when tried to allocate an inode in memory");
+
+	return &inode->kernel_vfs_inode;
+}
+
+void __baiano_free_inode(struct inode *inode) {
+	struct __vfs_baiano_inode *__inode = NULL;
+	__inode = container_of(inode, struct __vfs_baiano_inode, kernel_vfs_inode);
+
+	if (__inode == NULL)
+		pr_err("Error freeing inode\n");
+	else
+		kfree(__inode);
+}
+
+static struct super_operations sb_ops = {
+	.alloc_inode = __baiano_alloc_inode,
+	.free_inode  = __baiano_free_inode
+};
+
+
 // fill_sb function used as callback by get_tree
 static int __baiano_fill_superblock(struct super_block *sb, struct fs_context *fc) {
 	sb_set_blocksize(sb, DEFAULT_BSIZE);
 	struct buffer_head *bread_res = sb_bread(sb, 0);
-
 	if (!bread_res)
 		// Failed to read the superblock from disk
 		return -EIO; 
@@ -44,8 +70,15 @@ static int __baiano_fill_superblock(struct super_block *sb, struct fs_context *f
 	if (le64_to_cpu(__baiano_sb->magic) == BAIANO_MAGIC)
 		// The device is a BaianoFS formatted disk let's print for debugging;
 		printk("Found a BaianoFS Partition\n");
+	
 
-	sb->s_root = NULL;
+	sb->s_op = &sb_ops;
+	
+	struct inode *root_inode = new_inode(sb);
+	if(!root_inode) {
+		pr_err("Error allocating root inode\n");
+		return -ENOMEM;
+	}
 	return 0;
 }
 
