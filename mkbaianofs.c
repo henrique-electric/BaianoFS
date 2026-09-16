@@ -19,7 +19,7 @@ struct superblock {
 } __attribute__((packed));
 
 struct inode_struct {
-	unt32_t size;
+	uint32_t size;
 	char name[255];
 } __attribute__((packed));
 
