@@ -28,7 +28,7 @@ static const struct fs_context_operations __ctx_ops = {
 	.get_tree = __baiano_fs_get_tree,
 }; 
 
-
+// Deafault callback used by the VFS to allocate a new VFS inode object
 struct inode *__baiano_alloc_inode(struct super_block *sb) {
 	struct __vfs_baiano_inode *inode = NULL;
 	inode = kmalloc(sizeof(struct __vfs_baiano_inode), GFP_KERNEL);
@@ -38,6 +38,13 @@ struct inode *__baiano_alloc_inode(struct super_block *sb) {
 	return &inode->kernel_vfs_inode;
 }
 
+/*
+ * Function to free an allocated inode on the kernel heap
+ * Since we've allocated a custom structure (__vfs_baiano_inode)
+ * and not a conventional inode structure, we need to call container_of
+ * to calculate the address of the actual __vfs_baiano_inode struct that
+ * we got using kmalloc inside of __baiano_alloc_inode
+*/
 void __baiano_free_inode(struct inode *inode) {
 	struct __vfs_baiano_inode *__inode = NULL;
 	__inode = container_of(inode, struct __vfs_baiano_inode, kernel_vfs_inode);
