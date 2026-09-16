@@ -11,8 +11,12 @@
 #include "inode.h"
 
 #define DEFAULT_BSIZE 512
-#define BAIANO_MAGIC 0x004F4E41494142	// I reversed, because i reversed on mkbaianofs.c, since the cpu is writing on little endian, I HAVE TO FIX THIS!!
 
+#ifdef __LITTLE_ENDIAN__
+	#define BAIANO_MAGIC 0x004F4E41494142	// Reverse the order since we are are in __LITTLE_ENDIAN__
+#elif 
+	#define BAIANO_MAGIC 0x424149414E4F00
+#endif
 
 // Filesystem type structure, basic info for the VFS when register it
 static struct file_system_type __type = {
