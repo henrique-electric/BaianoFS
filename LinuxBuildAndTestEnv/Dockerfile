@@ -58,6 +58,13 @@ RUN wget -q "https://github.com/landley/toybox/archive/refs/tags/${TOYBOX_VERSIO
     && tar -xzf /tmp/toybox.tar.gz -C /opt/toybox-src --strip-components=1 \
     && rm /tmp/toybox.tar.gz
 
+
+ARG BASH_VERSION=5.3
+RUN wget -q "https://ftp.gnu.org/gnu/bash/bash-${BASH_VERSION}.tar.gz" -O /tmp/bash.tar.gz \
+    && mkdir -p /opt/bash-src \
+    && tar -xzf /tmp/bash.tar.gz -C /opt/bash-src --strip-components=1 \
+    && rm /tmp/bash.tar.gz
+
 COPY build-initramfs.sh /usr/local/bin/build-initramfs.sh
 RUN chmod +x /usr/local/bin/build-initramfs.sh
 

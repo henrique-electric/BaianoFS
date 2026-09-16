@@ -23,6 +23,12 @@ TOYBOX_SRC=/opt/toybox-src
 BUILD_DIR="/tmp/toybox-build-${ARCH}"
 ROOTFS="/tmp/initramfs-rootfs-${ARCH}"
 
+BASH_SRC=/opt/bash-src
+BASH_BUILD_DIR=/tmp/bash-build
+
+
+
+
 echo "==> Building static toybox  (ARCH=${ARCH}  CROSS_COMPILE=${CROSS_COMPILE:-<none, native>})"
 
 rm -rf "$BUILD_DIR" "$ROOTFS"
@@ -52,8 +58,17 @@ PREFIX="$ROOTFS" make install
 echo "==> Assembling root filesystem skeleton"
 mkdir -p "$ROOTFS"/{proc,sys,dev,tmp,root,etc,mnt}
 
+
+echo "==> building static version of bash"
+rm -rf "$BASH_BUILD_DIR"
+mkdir -p "$BASH_BUILD_DIR"/build
+mkdir -p $ROOTFS/bin
+cp -a "$BASH_SRC"/. "$BASH_BUILD_DIR"/
+cd $BASH_BUILD_DIR && $BASH_BUILD_DIR/configure --prefix=$BASH_BUILD_DIR/build --enable-static-link && make -j$(nproc) && make install && cp $BASH_BUILD_DIR/build/bin/bash $ROOTFS/bin
+
+
 cat > "$ROOTFS/init" <<'INIT'
-#!/bin/sh
+#!/bin/bash
 mount -t proc none /proc
 mount -t sysfs none /sys
 mount -t devtmpfs none /dev || echo "warning: devtmpfs mount failed — no /dev nodes (enable CONFIG_DEVTMPFS in the kernel .config)"
@@ -63,7 +78,7 @@ echo "Booted into initramfs (toybox)."
 echo "This is a plain rescue shell — there's no real root filesystem here."
 echo
 
-exec /bin/sh
+exec /bin/bash
 INIT
 chmod +x "$ROOTFS/init"
 
