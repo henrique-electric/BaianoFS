@@ -7,6 +7,8 @@ struct __baiano_superblock {
 	__u64 magic;
 	__u32 block_size;
 	__u32 inode_cout;
+	__u32 first_inode_block;
+	char  padding[492];
 } __packed;
 
 
