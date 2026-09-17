@@ -16,10 +16,10 @@ enum inode_type {
 };
 
 struct superblock {
-	int64_t magic;
-	int32_t blocksize;
-	int32_t inode_count;
-	int32_t first_inode_block;
+	uint64_t magic;
+	uint32_t blocksize;
+	uint32_t inode_count;
+	uint32_t first_inode_block;
 	char padding[492];
 } __attribute__((packed));
 
