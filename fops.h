@@ -4,7 +4,7 @@
 #include <linux/fs.h>
 #include <linux/compiler_types.h>
 
-ssize_t baiano_write(struct file *file, char __user *buff, size_t size, loff_t offset);
+ssize_t baiano_write(struct file *file, const char __user *buff, size_t size, loff_t *offset);
 
 
 
