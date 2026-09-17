@@ -9,14 +9,15 @@
 #include "super.h"
 #include "fs.h"
 #include "inode.h"
+#include "inode_ops.h"
+#include "fops.h"
+
 
 #define DEFAULT_BSIZE 512
 
-#ifdef __LITTLE_ENDIAN__
-	#define BAIANO_MAGIC 0x004F4E41494142	// Reverse the order since we are are in __LITTLE_ENDIAN__
-#elif 
-	#define BAIANO_MAGIC 0x424149414E4F00
-#endif
+#define BAIANO_MAGIC 0x004F4E41494142	// Reverse the order since we are are in __LITTLE_ENDIAN__
+
+static void __baiano_kill_sb(struct super_block *sb);
 
 // Filesystem type structure, basic info for the VFS when register it
 static struct file_system_type __type = {
@@ -24,6 +25,15 @@ static struct file_system_type __type = {
 	.fs_flags = FS_REQUIRES_DEV,
 	.owner = THIS_MODULE,
 	.init_fs_context = init_context,
+	.kill_sb = __baiano_kill_sb
+};
+
+static struct inode_operations __vfs_baiano_inode_ops = {
+	.mkdir = baiano_mkdir,
+};
+
+static struct file_operations __vfs_baiano_file_ops = {
+	.write = baiano_write,
 };
 
 
@@ -84,13 +94,23 @@ static int __baiano_fill_superblock(struct super_block *sb, struct fs_context *f
 	
 
 	sb->s_op = &sb_ops;
-	
+		
 	struct inode *root_inode = new_inode(sb);
 	if(!root_inode) {
 		pr_err("Error allocating root inode\n");
 		return -ENOMEM;
 	}
+
+	root_inode->i_op = &__vfs_baiano_inode_ops;
+	root_inode->i_fop = &__vfs_baiano_file_ops;
+
+	sb->s_root = d_make_root(root_inode);
 	return 0;
+}
+
+static void __baiano_kill_sb(struct super_block *sb) {
+	printk("Destroyed baianofs superblock");
+	return;
 }
 
 int __baiano_fs_get_tree(struct fs_context *ctx) {
