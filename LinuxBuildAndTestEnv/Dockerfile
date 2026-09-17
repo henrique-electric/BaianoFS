@@ -66,7 +66,9 @@ RUN wget -q "https://ftp.gnu.org/gnu/bash/bash-${BASH_VERSION}.tar.gz" -O /tmp/b
     && rm /tmp/bash.tar.gz
 
 COPY build-initramfs.sh /usr/local/bin/build-initramfs.sh
+COPY build-linux.sh     /usr/local/bin/build-linux.sh
 RUN chmod +x /usr/local/bin/build-initramfs.sh
+RUN chmod +x /usr/local/bin/build-linux.sh
 
 # Cross-compile environment variables so a bare `make` inside the container
 # defaults to arm64 without having to type these on every invocation.
