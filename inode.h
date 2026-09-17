@@ -2,8 +2,16 @@
 #define BAIANOFS_INODE_H
 #include <linux/fs.h>
 
+enum inode_type {
+	INODE_DIR,
+	INODE_FILE,
+	INODE_NOT_INIT,
+};
+
 struct __baiano_inode  {
 	__u32 size;
+	__u32 data_block;
+	__u8 inode_type;
 	char name[255];
 } __packed;
 
